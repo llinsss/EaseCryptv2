@@ -1,0 +1,940 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CryptoEase - Buy Crypto with Naira</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                borderRadius: {
+                    lg: "var(--radius)",
+                    md: "calc(var(--radius) - 2px)",
+                    sm: "calc(var(--radius) - 4px)",
+                },
+                colors: {
+                    background: "var(--background)",
+                    foreground: "var(--foreground)",
+                    card: {
+                        DEFAULT: "var(--card)",
+                        foreground: "var(--card-foreground)",
+                    },
+                    primary: {
+                        DEFAULT: "var(--primary)",
+                        foreground: "var(--primary-foreground)",
+                    },
+                    secondary: {
+                        DEFAULT: "var(--secondary)",
+                        foreground: "var(--secondary-foreground)",
+                    },
+                    muted: {
+                        DEFAULT: "var(--muted)",
+                        foreground: "var(--muted-foreground)",
+                    },
+                    accent: {
+                        DEFAULT: "var(--accent)",
+                        foreground: "var(--accent-foreground)",
+                    },
+                    destructive: {
+                        DEFAULT: "var(--destructive)",
+                        foreground: "var(--destructive-foreground)",
+                    },
+                    border: "var(--border)",
+                    input: "var(--input)",
+                    ring: "var(--ring)",
+                }
+            },
+            fontFamily: {
+                'sf': ['SF Pro Display', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+            }
+        }
+    };
+    </script>
+    
+    <style>
+        :root {
+            --radius: 12px;
+            
+            /* Light theme colors */
+            --background: hsl(210 40% 98%);
+            --foreground: hsl(210 40% 10%);
+            --card: hsl(0 0% 100%);
+            --card-foreground: hsl(210 40% 15%);
+            --primary: hsl(204 100% 40%); /* Telegram blue */
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(210 40% 96%);
+            --secondary-foreground: hsl(210 40% 20%);
+            --muted: hsl(210 40% 96%);
+            --muted-foreground: hsl(210 40% 45%);
+            --accent: hsl(204 100% 40%);
+            --accent-foreground: hsl(0 0% 100%);
+            --destructive: hsl(0 84% 60%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(210 40% 90%);
+            --input: hsl(210 40% 96%);
+            --ring: hsl(204 100% 40%);
+            
+            /* Success and warning colors */
+            --success: hsl(122 39% 49%);
+            --success-foreground: hsl(0 0% 100%);
+            --warning: hsl(35 91% 62%);
+            --warning-foreground: hsl(0 0% 100%);
+        }
+        
+        .dark {
+            --background: hsl(210 40% 8%);
+            --foreground: hsl(210 40% 90%);
+            --card: hsl(210 40% 10%);
+            --card-foreground: hsl(210 40% 85%);
+            --primary: hsl(204 100% 50%);
+            --primary-foreground: hsl(0 0% 100%);
+            --secondary: hsl(210 40% 12%);
+            --secondary-foreground: hsl(210 40% 80%);
+            --muted: hsl(210 40% 12%);
+            --muted-foreground: hsl(210 40% 55%);
+            --accent: hsl(204 100% 50%);
+            --accent-foreground: hsl(0 0% 100%);
+            --destructive: hsl(0 62% 50%);
+            --destructive-foreground: hsl(0 0% 100%);
+            --border: hsl(210 40% 20%);
+            --input: hsl(210 40% 12%);
+            --ring: hsl(204 100% 50%);
+        }
+        
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        .crypto-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            color: white;
+        }
+        
+        .btc { background: linear-gradient(135deg, #f7931a, #f7931a); }
+        .eth { background: linear-gradient(135deg, #627eea, #627eea); }
+        .usdc { background: linear-gradient(135deg, #2775ca, #2775ca); }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .countdown {
+            font-variant-numeric: tabular-nums;
+        }
+        
+        /* Touch-friendly improvements */
+        button, .button {
+            min-height: 44px;
+            touch-action: manipulation;
+        }
+        
+        input, select, textarea {
+            min-height: 44px;
+        }
+        
+        /* Loading animation */
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 3px solid #ffffff;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-background text-foreground font-sf">
+    <!-- @COMPONENT: InputPage -->
+    <div id="inputPage" class="page active">
+        <div class="max-w-md mx-auto">
+            <!-- Header -->
+            <div class="px-4 py-6 text-center bg-gradient-to-br from-primary to-accent text-primary-foreground">
+                <div class="flex items-center justify-center mb-2">
+                    <i class="fas fa-bitcoin-sign text-2xl mr-2"></i>
+                    <h1 class="text-2xl font-bold">CryptoEase</h1>
+                </div>
+                <h2 class="text-lg font-semibold mb-1">Buy Crypto Easily</h2>
+                <p class="text-sm opacity-90">Purchase cryptocurrency with fiat currency. No account needed.</p>
+            </div>
+            
+            <!-- Main Form -->
+            <div class="p-4 space-y-6">
+                <!-- Token Selection -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <label class="block text-sm font-medium text-foreground mb-3">Select Token</label>
+                    <div class="relative">
+                        <select id="tokenSelect" class="w-full bg-input border border-border rounded-lg px-4 py-3 pr-10 text-foreground appearance-none focus:ring-2 focus:ring-ring focus:outline-none">
+                            <option value="BTC">Bitcoin (BTC)</option>
+                            <option value="ETH">Ethereum (ETH)</option>
+                            <option value="USDC">USD Coin (USDC)</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+                    </div>
+                    <div class="flex items-center justify-between mt-2 text-sm text-muted-foreground">
+                        <span>Current Rate</span>
+                        <span id="currentRate" class="font-medium">₦95,420,000 / BTC</span>
+                    </div>
+                </div>
+                
+                <!-- Amount Input -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <label class="block text-sm font-medium text-foreground mb-3">Amount to Send (NGN)</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium">₦</span>
+                        <input 
+                            type="number" 
+                            id="amountInput"
+                            placeholder="1,000"
+                            class="w-full bg-input border border-border rounded-lg pl-8 pr-4 py-3 text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+                            min="1000"
+                            max="500000"
+                        />
+                    </div>
+                    <div class="flex justify-between mt-2 text-xs text-muted-foreground">
+                        <span>Min: ₦1,000</span>
+                        <span>Max: ₦500,000</span>
+                    </div>
+                    <div id="cryptoAmount" class="mt-2 text-sm text-accent font-medium">≈ 0.00 BTC</div>
+                </div>
+                
+                <!-- Wallet Address -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <label class="block text-sm font-medium text-foreground mb-3">Your Starknet Wallet Address</label>
+                    <div class="flex gap-2">
+                        <input 
+                            type="text" 
+                            id="walletInput"
+                            placeholder="0x..."
+                            class="flex-1 bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+                        />
+                        <button class="bg-secondary text-secondary-foreground px-4 py-3 rounded-lg border border-border flex items-center justify-center">
+                            <i class="fas fa-qrcode"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Email (Optional) -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <label class="block text-sm font-medium text-foreground mb-3">Email Address (Optional)</label>
+                    <input 
+                        type="email" 
+                        id="emailInput"
+                        placeholder="example@email.com"
+                        class="w-full bg-input border border-border rounded-lg px-4 py-3 text-foreground focus:ring-2 focus:ring-ring focus:outline-none"
+                    />
+                    <p class="text-xs text-muted-foreground mt-2">For transaction receipts and updates</p>
+                </div>
+                
+                <!-- Warning -->
+                <div class="bg-warning/10 border border-warning/20 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-exclamation-triangle text-warning mt-0.5"></i>
+                        <div>
+                            <p class="text-sm font-medium text-warning-foreground">Important Notice</p>
+                            <p class="text-xs text-muted-foreground mt-1">Double-check your wallet address. Funds sent to wrong addresses cannot be recovered.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Get Quote Button -->
+                <button 
+                    id="getQuoteBtn"
+                    class="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-lg transition-all duration-200 active:scale-95 disabled:opacity-50"
+                >
+                    GET QUOTE
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: InputPage -->
+    
+    <!-- @COMPONENT: SummaryPage -->
+    <div id="summaryPage" class="page">
+        <div class="max-w-md mx-auto">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 bg-card border-b border-border">
+                <button id="backToInput" class="text-primary">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h1 class="text-lg font-semibold">Transaction Summary</h1>
+                <div class="w-6"></div>
+            </div>
+            
+            <!-- Summary Content -->
+            <div class="p-4 space-y-6">
+                <!-- Transaction Overview -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <div class="text-center mb-4">
+                        <div id="summaryToken" class="crypto-icon btc mx-auto mb-2">₿</div>
+                        <h3 class="font-semibold text-lg">Bitcoin Purchase</h3>
+                        <p class="text-sm text-muted-foreground">You're buying BTC with NGN</p>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">You Send</span>
+                            <span class="font-semibold" id="summaryAmount">₦50,000</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">You Receive</span>
+                            <span class="font-semibold text-accent" id="summaryReceive">≈ 0.000524 BTC</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rate Details -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h4 class="font-medium mb-3">Rate Details</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Exchange Rate</span>
+                            <span id="summaryRate">1 BTC = ₦95,420,000</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Network Fee</span>
+                            <span>₦50</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Service Fee (1%)</span>
+                            <span id="serviceFee">₦500</span>
+                        </div>
+                        <hr class="border-border">
+                        <div class="flex justify-between font-medium">
+                            <span>Total Cost</span>
+                            <span id="totalCost">₦50,550</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Rate Notice -->
+                <div class="bg-muted/50 rounded-lg p-4">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-info-circle text-accent mt-0.5"></i>
+                        <div class="text-sm">
+                            <p class="font-medium">Rate Protection</p>
+                            <p class="text-muted-foreground mt-1">This rate is guaranteed for 10 minutes after payment initiation.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wallet Address Confirmation -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h4 class="font-medium mb-2">Receiving Address</h4>
+                    <div class="bg-muted rounded p-3 text-sm font-mono break-all" id="confirmWallet">
+                        0x1234...5678
+                    </div>
+                </div>
+                
+                <!-- Continue Button -->
+                <button 
+                    id="continueToPayment"
+                    class="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-lg transition-all duration-200 active:scale-95"
+                >
+                    Continue to Payment
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: SummaryPage -->
+    
+    <!-- @COMPONENT: PaymentPage -->
+    <div id="paymentPage" class="page">
+        <div class="max-w-md mx-auto">
+            <!-- Header with Timer -->
+            <div class="bg-primary text-primary-foreground p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <button id="backToSummary" class="text-primary-foreground/80">
+                        <i class="fas fa-arrow-left text-xl"></i>
+                    </button>
+                    <h1 class="text-lg font-semibold">Payment Details</h1>
+                    <div class="w-6"></div>
+                </div>
+                <div class="text-center">
+                    <div class="text-sm opacity-80">Time Remaining</div>
+                    <div id="countdown" class="text-2xl font-bold countdown">09:59</div>
+                </div>
+            </div>
+            
+            <!-- Payment Instructions -->
+            <div class="p-4 space-y-6">
+                <!-- Virtual Account Details -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h3 class="font-semibold mb-4 flex items-center gap-2">
+                        <i class="fas fa-university text-primary"></i>
+                        Bank Transfer Details
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-sm text-muted-foreground">Account Number</label>
+                            <div class="flex items-center justify-between bg-muted rounded-lg p-3 mt-1">
+                                <span class="font-mono text-lg font-semibold" id="accountNumber">2085647391</span>
+                                <button id="copyAccountBtn" class="text-primary hover:text-primary/80">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm text-muted-foreground">Bank Name</label>
+                            <div class="bg-muted rounded-lg p-3 mt-1">
+                                <span class="font-semibold">Providus Bank</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm text-muted-foreground">Account Name</label>
+                            <div class="bg-muted rounded-lg p-3 mt-1">
+                                <span class="font-semibold">EaseCrypt Payments</span>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="text-sm text-muted-foreground">Amount to Transfer</label>
+                            <div class="bg-accent/10 border border-accent/20 rounded-lg p-3 mt-1">
+                                <span class="font-bold text-lg text-accent" id="paymentAmount">₦50,550</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Instructions -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h4 class="font-semibold mb-3">How to Pay</h4>
+                    <div class="space-y-3">
+                        <div class="flex gap-3">
+                            <div class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">1</div>
+                            <div class="flex-1">
+                                <p class="text-sm">Open your banking app or dial <strong>*737#</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">2</div>
+                            <div class="flex-1">
+                                <p class="text-sm">Transfer the <strong>exact amount</strong> shown above</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">3</div>
+                            <div class="flex-1">
+                                <p class="text-sm">Use the account number: <strong>2085647391</strong></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-sm font-semibold">4</div>
+                            <div class="flex-1">
+                                <p class="text-sm">Click <strong>"I've Made the Payment"</strong> below</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Warning -->
+                <div class="bg-warning/10 border border-warning/20 rounded-lg p-4">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                        <div class="text-sm">
+                            <p class="font-medium text-warning-foreground">Important</p>
+                            <p class="text-muted-foreground mt-1">Transfer the exact amount within the time limit. Partial payments will be refunded.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button 
+                        id="paidBtn"
+                        class="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold text-lg transition-all duration-200 active:scale-95"
+                    >
+                        <i class="fas fa-check mr-2"></i>
+                        I've Made the Payment
+                    </button>
+                    
+                    <button 
+                        id="copyFullDetails"
+                        class="w-full bg-secondary text-secondary-foreground py-3 rounded-lg font-medium transition-all duration-200 active:scale-95"
+                    >
+                        <i class="fas fa-copy mr-2"></i>
+                        Copy Account Details
+                    </button>
+                </div>
+                
+                <!-- Support -->
+                <div class="text-center">
+                    <button class="text-primary text-sm">
+                        <i class="fas fa-headset mr-1"></i>
+                        Need Help? Contact Support
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: PaymentPage -->
+    
+    <!-- @COMPONENT: LoadingPage -->
+    <div id="loadingPage" class="page">
+        <div class="max-w-md mx-auto h-screen flex items-center justify-center">
+            <div class="text-center p-8">
+                <div class="mb-6">
+                    <div class="spinner mx-auto mb-4"></div>
+                    <div class="pulse-animation">
+                        <h2 class="text-xl font-semibold mb-2">Confirming Payment...</h2>
+                        <p class="text-muted-foreground">This usually takes 1-2 minutes</p>
+                    </div>
+                </div>
+                
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-2 h-2 bg-accent rounded-full animate-pulse"></div>
+                        <span class="text-sm">Verifying bank transfer</span>
+                    </div>
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-2 h-2 bg-muted rounded-full"></div>
+                        <span class="text-sm text-muted-foreground">Processing crypto transfer</span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 bg-muted rounded-full"></div>
+                        <span class="text-sm text-muted-foreground">Sending to your wallet</span>
+                    </div>
+                </div>
+                
+                <div class="mt-6 text-xs text-muted-foreground">
+                    Transaction ID: #TXN-789456123
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: LoadingPage -->
+    
+    <!-- @COMPONENT: SuccessPage -->
+    <div id="successPage" class="page">
+        <div class="max-w-md mx-auto">
+            <!-- Success Header -->
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 text-center">
+                <div class="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-2xl"></i>
+                </div>
+                <h1 class="text-2xl font-bold mb-2">Transaction Complete!</h1>
+                <p class="text-green-100">Your crypto has been sent successfully</p>
+            </div>
+            
+            <!-- Transaction Details -->
+            <div class="p-4 space-y-6">
+                <!-- Success Summary -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <div class="text-center mb-4">
+                        <div class="crypto-icon btc mx-auto mb-2">₿</div>
+                        <h3 class="font-semibold text-lg">Payment Successful!</h3>
+                        <p class="text-accent text-xl font-bold mt-1">0.000524 BTC</p>
+                        <p class="text-sm text-muted-foreground">has been sent to your wallet</p>
+                    </div>
+                </div>
+                
+                <!-- Receipt Details -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h4 class="font-semibold mb-3 flex items-center gap-2">
+                        <i class="fas fa-receipt text-primary"></i>
+                        Transaction Receipt
+                    </h4>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Transaction ID</span>
+                            <span class="font-mono">#TXN-789456123</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Amount Paid</span>
+                            <span class="font-semibold">₦50,550</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Crypto Received</span>
+                            <span class="font-semibold text-accent">0.000524 BTC</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Exchange Rate</span>
+                            <span>₦95,420,000/BTC</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Date & Time</span>
+                            <span id="transactionDate">Jan 24, 2024 14:32</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-muted-foreground">Network</span>
+                            <span>Starknet</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Wallet Address -->
+                <div class="bg-card rounded-lg p-4 border border-border">
+                    <h4 class="font-medium mb-2">Sent to Wallet</h4>
+                    <div class="bg-muted rounded p-3 text-sm font-mono break-all">
+                        0x1234567890abcdef1234567890abcdef12345678
+                    </div>
+                    <div class="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <i class="fas fa-external-link-alt"></i>
+                        <a href="#" class="text-primary">View on Starkscan</a>
+                    </div>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="space-y-3">
+                    <button class="w-full bg-primary text-primary-foreground py-4 rounded-lg font-semibold transition-all duration-200 active:scale-95">
+                        <i class="fas fa-download mr-2"></i>
+                        Download PDF Receipt
+                    </button>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <button class="bg-secondary text-secondary-foreground py-3 rounded-lg font-medium transition-all duration-200 active:scale-95">
+                            <i class="fas fa-share mr-2"></i>
+                            Share
+                        </button>
+                        <button class="bg-secondary text-secondary-foreground py-3 rounded-lg font-medium transition-all duration-200 active:scale-95">
+                            <i class="fas fa-headset mr-2"></i>
+                            Support
+                        </button>
+                    </div>
+                    
+                    <button 
+                        id="newTransaction"
+                        class="w-full bg-accent text-accent-foreground py-4 rounded-lg font-semibold transition-all duration-200 active:scale-95"
+                    >
+                        <i class="fas fa-plus mr-2"></i>
+                        Start New Transaction
+                    </button>
+                </div>
+                
+                <!-- Referral Banner -->
+                <div class="bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-200 rounded-lg p-4">
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-gift text-purple-500 text-xl"></i>
+                        <div class="flex-1">
+                            <p class="font-medium text-sm">Earn 50% Fee Discount</p>
+                            <p class="text-xs text-muted-foreground">Refer friends and get discounted trading fees</p>
+                        </div>
+                        <button class="text-primary text-sm font-medium">
+                            Share <i class="fas fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: SuccessPage -->
+
+    <script>
+    // Mock Telegram WebApp initialization
+    (function() {
+        if (typeof window.Telegram === 'undefined') {
+            window.Telegram = {
+                WebApp: {
+                    ready: function() {},
+                    expand: function() {},
+                    enableClosingConfirmation: function() {},
+                    disableClosingConfirmation: function() {},
+                    themeParams: {
+                        bg_color: '#ffffff',
+                        text_color: '#000000',
+                        hint_color: '#999999',
+                        link_color: '#0088cc',
+                        button_color: '#0088cc',
+                        button_text_color: '#ffffff'
+                    },
+                    colorScheme: 'light',
+                    platform: 'ios'
+                }
+            };
+        }
+    })();
+
+    // Initialize Telegram WebApp
+    Telegram.WebApp.ready();
+    Telegram.WebApp.expand();
+
+    // Theme management
+    function initializeTheme() {
+        const tg = Telegram.WebApp;
+        if (tg.colorScheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+        
+        // Apply Telegram theme colors if available
+        if (tg.themeParams) {
+            const root = document.documentElement;
+            root.style.setProperty('--tg-theme-bg', tg.themeParams.bg_color || '#ffffff');
+            root.style.setProperty('--tg-theme-text', tg.themeParams.text_color || '#000000');
+            root.style.setProperty('--tg-theme-link', tg.themeParams.link_color || '#0088cc');
+        }
+    }
+
+    // Page navigation
+    const pages = ['inputPage', 'summaryPage', 'paymentPage', 'loadingPage', 'successPage'];
+    let currentPageIndex = 0;
+
+    function showPage(pageId) {
+        pages.forEach(page => {
+            document.getElementById(page).classList.remove('active');
+        });
+        document.getElementById(pageId).classList.add('active');
+        currentPageIndex = pages.indexOf(pageId);
+        
+        // Haptic feedback for page transitions
+        if (Telegram.WebApp.HapticFeedback) {
+            Telegram.WebApp.HapticFeedback.impactOccurred('light');
+        }
+    }
+
+    // Mock crypto rates (in production, fetch from CoinGecko API)
+    const cryptoRates = {
+        BTC: 95420000, // NGN per BTC
+        ETH: 5280000,  // NGN per ETH  
+        USDC: 1650     // NGN per USDC
+    };
+
+    // Form state management
+    let transactionData = {
+        token: 'BTC',
+        amount: 0,
+        walletAddress: '',
+        email: '',
+        rate: cryptoRates.BTC,
+        cryptoAmount: 0,
+        totalCost: 0
+    };
+
+    // Input page logic
+    function initializeInputPage() {
+        const tokenSelect = document.getElementById('tokenSelect');
+        const amountInput = document.getElementById('amountInput');
+        const walletInput = document.getElementById('walletInput');
+        const emailInput = document.getElementById('emailInput');
+        const getQuoteBtn = document.getElementById('getQuoteBtn');
+        const currentRate = document.getElementById('currentRate');
+        const cryptoAmount = document.getElementById('cryptoAmount');
+
+        // Token selection change
+        tokenSelect.addEventListener('change', function() {
+            const selectedToken = this.value;
+            transactionData.token = selectedToken;
+            transactionData.rate = cryptoRates[selectedToken];
+            
+            // Update rate display
+            currentRate.textContent = `₦${transactionData.rate.toLocaleString()} / ${selectedToken}`;
+            
+            // Update crypto icon
+            const iconClass = selectedToken.toLowerCase();
+            document.getElementById('summaryToken').className = `crypto-icon ${iconClass}`;
+            document.getElementById('summaryToken').textContent = 
+                selectedToken === 'BTC' ? '₿' : 
+                selectedToken === 'ETH' ? 'Ξ' : 
+                'USDC';
+                
+            calculateCryptoAmount();
+        });
+
+        // Amount input change
+        amountInput.addEventListener('input', function() {
+            const amount = parseFloat(this.value) || 0;
+            transactionData.amount = amount;
+            calculateCryptoAmount();
+            validateForm();
+        });
+
+        // Wallet address input
+        walletInput.addEventListener('input', function() {
+            transactionData.walletAddress = this.value;
+            validateForm();
+        });
+
+        // Email input
+        emailInput.addEventListener('input', function() {
+            transactionData.email = this.value;
+        });
+
+        // Calculate crypto amount
+        function calculateCryptoAmount() {
+            if (transactionData.amount > 0 && transactionData.rate > 0) {
+                const crypto = transactionData.amount / transactionData.rate;
+                transactionData.cryptoAmount = crypto;
+                cryptoAmount.textContent = `≈ ${crypto.toFixed(6)} ${transactionData.token}`;
+            } else {
+                cryptoAmount.textContent = `≈ 0.00 ${transactionData.token}`;
+            }
+        }
+
+        // Form validation
+        function validateForm() {
+            const isValidAmount = transactionData.amount >= 1000 && transactionData.amount <= 500000;
+            const isValidWallet = transactionData.walletAddress.match(/^0x[a-fA-F0-9]{64}$/);
+            
+            getQuoteBtn.disabled = !(isValidAmount && isValidWallet);
+            getQuoteBtn.classList.toggle('opacity-50', getQuoteBtn.disabled);
+        }
+
+        // Get quote button
+        getQuoteBtn.addEventListener('click', function() {
+            if (!getQuoteBtn.disabled) {
+                updateSummaryPage();
+                showPage('summaryPage');
+            }
+        });
+
+        // Initialize
+        tokenSelect.dispatchEvent(new Event('change'));
+    }
+
+    // Summary page logic
+    function updateSummaryPage() {
+        const serviceFee = transactionData.amount * 0.01; // 1%
+        const networkFee = 50;
+        const totalCost = transactionData.amount + serviceFee + networkFee;
+        
+        transactionData.totalCost = totalCost;
+
+        document.getElementById('summaryAmount').textContent = `₦${transactionData.amount.toLocaleString()}`;
+        document.getElementById('summaryReceive').textContent = `≈ ${transactionData.cryptoAmount.toFixed(6)} ${transactionData.token}`;
+        document.getElementById('summaryRate').textContent = `1 ${transactionData.token} = ₦${transactionData.rate.toLocaleString()}`;
+        document.getElementById('serviceFee').textContent = `₦${serviceFee.toFixed(0)}`;
+        document.getElementById('totalCost').textContent = `₦${totalCost.toLocaleString()}`;
+        document.getElementById('confirmWallet').textContent = transactionData.walletAddress;
+    }
+
+    // Payment page logic
+    function initializePaymentPage() {
+        let timeLeft = 10 * 60; // 10 minutes in seconds
+        const countdownElement = document.getElementById('countdown');
+        const paymentAmountElement = document.getElementById('paymentAmount');
+        
+        // Update payment amount
+        paymentAmountElement.textContent = `₦${transactionData.totalCost.toLocaleString()}`;
+        
+        // Countdown timer
+        const timer = setInterval(() => {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            countdownElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                // Handle timeout
+                alert('Payment time expired. Please start a new transaction.');
+                showPage('inputPage');
+            }
+            timeLeft--;
+        }, 1000);
+
+        // Copy account number
+        document.getElementById('copyAccountBtn').addEventListener('click', function() {
+            navigator.clipboard.writeText('2085647391').then(() => {
+                // TODO: Show toast notification
+                if (Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+            });
+        });
+
+        // Copy full details
+        document.getElementById('copyFullDetails').addEventListener('click', function() {
+            const details = `Account Number: 2085647391\nBank: Providus Bank\nAccount Name: EaseCrypt Payments\nAmount: ₦${transactionData.totalCost.toLocaleString()}`;
+            navigator.clipboard.writeText(details).then(() => {
+                // TODO: Show toast notification
+                if (Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+            });
+        });
+
+        // Payment confirmation
+        document.getElementById('paidBtn').addEventListener('click', function() {
+            showPage('loadingPage');
+            // Simulate payment verification
+            setTimeout(() => {
+                showPage('successPage');
+                updateSuccessPage();
+            }, 3000);
+        });
+    }
+
+    // Success page logic
+    function updateSuccessPage() {
+        const now = new Date();
+        document.getElementById('transactionDate').textContent = now.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Navigation event listeners
+    function initializeNavigation() {
+        document.getElementById('backToInput')?.addEventListener('click', () => showPage('inputPage'));
+        document.getElementById('backToSummary')?.addEventListener('click', () => showPage('summaryPage'));
+        document.getElementById('continueToPayment')?.addEventListener('click', () => {
+            showPage('paymentPage');
+            initializePaymentPage();
+        });
+        document.getElementById('newTransaction')?.addEventListener('click', () => {
+            // Reset form
+            location.reload();
+        });
+    }
+
+    // Initialize app
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeTheme();
+        initializeInputPage();
+        initializeNavigation();
+        
+        // Enable closing confirmation
+        Telegram.WebApp.enableClosingConfirmation();
+    });
+    </script>
+</body>
+</html>
