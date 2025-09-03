@@ -4,8 +4,13 @@ import {
   type CryptoRate, 
   type InsertCryptoRate,
   type PaymentSession,
-  type InsertPaymentSession 
+  type InsertPaymentSession,
+  transactions,
+  cryptoRates,
+  paymentSessions
 } from "@shared/schema";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -159,4 +164,110 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+export class DatabaseStorage implements IStorage {
+  async createTransaction(insertTransaction: InsertTransaction): Promise<Transaction> {
+    const [transaction] = await db
+      .insert(transactions)
+      .values({
+        ...insertTransaction,
+        paymentStatus: insertTransaction.paymentStatus || "pending",
+      })
+      .returning();
+    return transaction;
+  }
+
+  async getTransaction(id: string): Promise<Transaction | undefined> {
+    const [transaction] = await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.id, id));
+    return transaction || undefined;
+  }
+
+  async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction | undefined> {
+    const [transaction] = await db
+      .update(transactions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(transactions.id, id))
+      .returning();
+    return transaction || undefined;
+  }
+
+  async getTransactionsByWallet(walletAddress: string): Promise<Transaction[]> {
+    return await db
+      .select()
+      .from(transactions)
+      .where(eq(transactions.walletAddress, walletAddress))
+      .orderBy(desc(transactions.createdAt));
+  }
+
+  async getCryptoRate(symbol: string): Promise<CryptoRate | undefined> {
+    const [rate] = await db
+      .select()
+      .from(cryptoRates)
+      .where(eq(cryptoRates.symbol, symbol));
+    return rate || undefined;
+  }
+
+  async updateCryptoRate(rate: InsertCryptoRate): Promise<CryptoRate> {
+    const [existingRate] = await db
+      .select()
+      .from(cryptoRates)
+      .where(eq(cryptoRates.symbol, rate.symbol));
+
+    if (existingRate) {
+      const [updated] = await db
+        .update(cryptoRates)
+        .set({ ...rate, lastUpdated: new Date() })
+        .where(eq(cryptoRates.symbol, rate.symbol))
+        .returning();
+      return updated;
+    } else {
+      const [created] = await db
+        .insert(cryptoRates)
+        .values({ ...rate, lastUpdated: new Date() })
+        .returning();
+      return created;
+    }
+  }
+
+  async getAllCryptoRates(): Promise<CryptoRate[]> {
+    return await db.select().from(cryptoRates);
+  }
+
+  async createPaymentSession(insertSession: InsertPaymentSession): Promise<PaymentSession> {
+    const [session] = await db
+      .insert(paymentSessions)
+      .values(insertSession)
+      .returning();
+    return session;
+  }
+
+  async getPaymentSession(id: string): Promise<PaymentSession | undefined> {
+    const [session] = await db
+      .select()
+      .from(paymentSessions)
+      .where(eq(paymentSessions.id, id));
+    return session || undefined;
+  }
+
+  async updatePaymentSession(id: string, updates: Partial<PaymentSession>): Promise<PaymentSession | undefined> {
+    const [session] = await db
+      .update(paymentSessions)
+      .set(updates)
+      .where(eq(paymentSessions.id, id))
+      .returning();
+    return session || undefined;
+  }
+
+  async cleanupExpiredSessions(): Promise<void> {
+    await db
+      .delete(paymentSessions)
+      .where(eq(paymentSessions.expiresAt, new Date()));
+  }
+}
+
+// Use database storage in production, memory storage in development
+export const storage = process.env.NODE_ENV === 'production' 
+  ? new DatabaseStorage() 
+  : new MemStorage();
