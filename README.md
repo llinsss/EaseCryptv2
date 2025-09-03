@@ -180,7 +180,7 @@ npm run db:studio
 ## 📁 Project Structure
 
 ```
-├── client/                 # Frontend React application
+├── frontend/               # Frontend React application
 │   ├── src/
 │   │   ├── components/     # Reusable UI components
 │   │   ├── pages/         # Application pages
@@ -188,7 +188,7 @@ npm run db:studio
 │   │   ├── lib/           # Utility functions
 │   │   └── index.css      # Global styles
 │   └── index.html
-├── server/                 # Backend Express application
+├── backend/                # Backend Express application
 │   ├── db.ts              # Database connection
 │   ├── storage.ts         # Data access layer
 │   ├── routes.ts          # API routes
@@ -196,13 +196,18 @@ npm run db:studio
 │   ├── blockchain.ts      # Starknet integration
 │   ├── middleware.ts      # Security and validation
 │   ├── cache.ts           # Caching system
+│   ├── vite.ts            # Development server setup
 │   └── index.ts           # Server entry point
+├── contracts/              # Smart contract interfaces
+│   └── README.md          # Contract documentation
 ├── shared/                 # Shared types and schemas
 │   └── schema.ts          # Database schemas
 ├── docs/                   # Documentation
 │   ├── DEPLOYMENT_GUIDE.md
 │   ├── TELEGRAM_SETUP.md
 │   └── LEGAL_COMPLIANCE.md
+├── client -> frontend      # Symlink for compatibility
+├── server -> backend       # Symlink for compatibility
 └── config files           # Configuration files
 ```
 
