@@ -70,6 +70,7 @@ export class MemStorage implements IStorage {
       paymentReference: insertTransaction.paymentReference || null,
       transactionHash: insertTransaction.transactionHash || null,
       metadata: insertTransaction.metadata || null,
+      paymentStatus: insertTransaction.paymentStatus || "pending",
       id,
       createdAt: new Date(),
       updatedAt: new Date(),

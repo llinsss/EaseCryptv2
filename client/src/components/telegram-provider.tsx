@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { initTelegram, type TelegramWebApp } from "@/lib/telegram";
+import { initTelegram, type TelegramWebApp } from "@/lib/telegram.ts";
 
 interface TelegramContextType {
   webApp: TelegramWebApp | null;
@@ -18,8 +18,8 @@ export const TelegramContext = createContext<TelegramContextType>({
 export function TelegramProvider({ children }: { children: ReactNode }) {
   const [webApp, setWebApp] = useState<TelegramWebApp | null>(null);
   const [isReady, setIsReady] = useState(false);
-  const [user, setUser] = useState(null);
-  const [themeParams, setThemeParams] = useState(null);
+  const [user, setUser] = useState<any>(null);
+  const [themeParams, setThemeParams] = useState<any>(null);
 
   useEffect(() => {
     const tg = initTelegram();
