@@ -82,7 +82,7 @@ export class StarknetService {
   async getTransactionStatus(txHash: string): Promise<'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED'> {
     try {
       const receipt = await this.provider.getTransactionReceipt(txHash);
-      return receipt.execution_status as any;
+      return (receipt as any).execution_status || 'PENDING';
     } catch (error) {
       console.error('Error getting transaction status:', error);
       return 'PENDING';
