@@ -138,6 +138,10 @@
   .crypto-icon.usdc {
     background: linear-gradient(135deg, #2775ca, #2775ca);
   }
+  
+  .crypto-icon.strk {
+    background: linear-gradient(135deg, #0c0c4f, #0c0c4f);
+  }
 
   /* Telegram-style button */
   .telegram-button {

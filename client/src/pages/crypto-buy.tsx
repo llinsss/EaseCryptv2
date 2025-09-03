@@ -41,7 +41,7 @@ import {
 
 type PageType = "input" | "summary" | "payment" | "loading" | "success";
 
-type TokenSymbol = "BTC" | "ETH" | "USDC";
+type TokenSymbol = "BTC" | "ETH" | "USDC" | "STRK";
 
 interface TransactionData {
   tokenSymbol: TokenSymbol;
@@ -347,10 +347,10 @@ function InputPage({
       return;
     }
 
-    if (!isValidStarknetAddress(transactionData.walletAddress)) {
+    if (!transactionData.walletAddress.trim()) {
       toast({
         title: "Invalid Wallet Address",
-        description: "Please enter a valid Starknet wallet address",
+        description: "Please enter a valid wallet address",
         variant: "destructive",
       });
       return;
@@ -401,6 +401,7 @@ function InputPage({
                 <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
                 <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
                 <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
+                <SelectItem value="STRK">Starknet (STRK)</SelectItem>
               </SelectContent>
             </Select>
             

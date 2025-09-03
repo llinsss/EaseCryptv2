@@ -235,7 +235,7 @@ async function updateRatesFromAPI() {
   try {
     const COINGECKO_API = process.env.COINGECKO_API_KEY || "CG-demo-api-key";
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,usd-coin&vs_currencies=ngn&x_cg_demo_api_key=${COINGECKO_API}`
+      `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,usd-coin,starknet&vs_currencies=ngn&x_cg_demo_api_key=${COINGECKO_API}`
     );
     
     if (!response.ok) {
@@ -248,6 +248,7 @@ async function updateRatesFromAPI() {
       { symbol: "BTC", priceNgn: Math.floor(data.bitcoin?.ngn * 100) },
       { symbol: "ETH", priceNgn: Math.floor(data.ethereum?.ngn * 100) },
       { symbol: "USDC", priceNgn: Math.floor(data["usd-coin"]?.ngn * 100) },
+      { symbol: "STRK", priceNgn: Math.floor(data.starknet?.ngn * 100) },
     ];
     
     for (const update of updates) {

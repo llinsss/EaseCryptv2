@@ -64,14 +64,14 @@ export type InsertPaymentSession = z.infer<typeof insertPaymentSessionSchema>;
 
 // Validation schemas for API endpoints
 export const createTransactionSchema = z.object({
-  tokenSymbol: z.enum(["BTC", "ETH", "USDC"]),
+  tokenSymbol: z.enum(["BTC", "ETH", "USDC", "STRK"]),
   amountNgn: z.number().min(100000).max(50000000), // ₦1,000 to ₦500,000 in kobo
-  walletAddress: z.string().regex(/^0x[a-fA-F0-9]{64}$/, "Invalid Starknet address"),
+  walletAddress: z.string().min(1, "Wallet address is required"),
   email: z.string().email().optional(),
 });
 
 export const getQuoteSchema = z.object({
-  tokenSymbol: z.enum(["BTC", "ETH", "USDC"]),
+  tokenSymbol: z.enum(["BTC", "ETH", "USDC", "STRK"]),
   amountNgn: z.number().min(100000).max(50000000),
 });
 

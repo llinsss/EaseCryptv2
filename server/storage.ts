@@ -46,6 +46,7 @@ export class MemStorage implements IStorage {
       { symbol: "BTC", priceNgn: 9542000000 }, // ₦95,420,000 in kobo
       { symbol: "ETH", priceNgn: 528000000 },  // ₦5,280,000 in kobo
       { symbol: "USDC", priceNgn: 165000 },    // ₦1,650 in kobo
+      { symbol: "STRK", priceNgn: 120000 },    // ₦1,200 in kobo
     ];
 
     defaultRates.forEach(rate => {
