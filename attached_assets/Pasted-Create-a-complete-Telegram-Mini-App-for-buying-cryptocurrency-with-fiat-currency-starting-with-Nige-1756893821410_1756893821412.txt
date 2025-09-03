@@ -1,0 +1,29 @@
+Create a complete Telegram Mini App for buying cryptocurrency with fiat currency (starting with Nigerian Naira) on Starknet blockchain. The app should not require any user account creation—users just input details and transact anonymously. Make the UI look and feel like it's running on a mobile phone: use responsive design with touch-friendly buttons, vertical scrolling, safe-area insets for notches, and Telegram's theme integration (light/dark mode). Use React.js with Telegram WebApp SDK for the frontend, Node.js/Express for the backend, and a simple Cairo smart contract on Starknet for token dispensing.
+Core Flow:
+
+Input Page: Header 'Buy Crypto Easily' with subtitle 'Purchase cryptocurrency with fiat currency. No account needed.' Fields: Select Token (dropdown: BTC, ETH, USDC), Amount to send (NGN input), Your Wallet Address (text input with QR scan button), Email Address (optional, prefill example like llinsomoudu@gmail.com). Warning: 'Double-check your wallet address. Funds sent to wrong addresses cannot be recovered.' Button: 'GET QUOTE'.
+Summary Page: 'Transaction Summary' showing NGN amount, approximate crypto received, details like Exchange Rate (1 BTC = ₦X), Network Fee (₦50), Total Cost. Note on rate fluctuations. Button: 'Continue to Payment'.
+Payment Page: 'Payment Details' with countdown timer (e.g., 10:00 remaining), virtual account number (e.g., 2085647391 at Providus Bank, EaseCrypt Payments). Instructions: 1. Open banking app or dial *737#, 2. Transfer exact amount, 3. Use account number, 4. Click 'I've Paid'. Buttons: 'I've Made the Payment', 'Copy Account Number'.
+Loading Screen: Brief splash with 'Confirming payment...' animation while backend checks.
+Success Page: 'Transaction Complete' with 'Payment Successful!', crypto credited amount, receipt details (ID, Amount Paid, Crypto Received, Date/Time). Buttons: 'Download PDF', 'Share', 'Help & Support', 'Start New Transaction'.
+
+Enhanced Features to Include:
+
+Multi-token support with real-time rates from CoinGecko API (refresh every 30s).
+Wallet QR scanner using Telegram camera API.
+Input validation: Check Starknet wallet format, amount limits (min ₦1000, max ₦500000), error pop-ups.
+Multi-fiat (add USD option via gateway).
+Local storage for transaction history view.
+Support chat button opening Telegram bot.
+Dark mode auto-toggle.
+Referral links for fee discounts.
+Security pop-ups and offline rate fallback.
+Anonymous analytics logging.
+
+Integrations:
+
+Payment: Use Flutterwave or Paystack for virtual bank accounts and webhooks for confirmation.
+Starknet: Backend uses Starknet.js to send tokens from a dispenser contract after payment confirm.
+Deploy: Frontend on Vercel, backend on Heroku, contract on Starknet mainnet.
+
+Provide full code: React frontend components with state management, Node.js backend APIs (get-quote, create-payment, check-payment, webhook), Cairo contract example. Include setup instructions for Telegram bot, API keys, and testing on testnet. Ensure mobile-phone UX: Full-screen, gesture navigation, haptic feedback if possible via SDK."6.7sHow can Grok help?
