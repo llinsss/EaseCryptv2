@@ -41,7 +41,7 @@ import {
 
 type PageType = "input" | "summary" | "payment" | "loading" | "success";
 
-type TokenSymbol = "BTC" | "ETH" | "USDC" | "STRK";
+type TokenSymbol = "BTC" | "ETH" | "USDC";
 
 interface TransactionData {
   tokenSymbol: TokenSymbol;
@@ -401,7 +401,6 @@ function InputPage({
                 <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
                 <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
                 <SelectItem value="USDC">USD Coin (USDC)</SelectItem>
-                <SelectItem value="STRK">Starknet (STRK)</SelectItem>
               </SelectContent>
             </Select>
             
