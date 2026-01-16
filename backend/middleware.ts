@@ -99,7 +99,7 @@ export const validateTransactionInput = (req: Request, res: Response, next: Next
   const errors: string[] = [];
 
   // Validate token symbol
-  if (!tokenSymbol || !['BTC', 'ETH', 'USDC', 'STRK'].includes(tokenSymbol)) {
+  if (!tokenSymbol || !['BTC', 'ETH', 'USDC'].includes(tokenSymbol)) {
     errors.push('Invalid token symbol');
   }
 
