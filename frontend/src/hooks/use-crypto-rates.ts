@@ -10,7 +10,6 @@ interface CryptoRates {
   BTC: CryptoRate;
   ETH: CryptoRate;
   USDC: CryptoRate;
-  STRK: CryptoRate;
 }
 
 export function useCryptoRates() {
@@ -71,8 +70,6 @@ export function formatCryptoAmount(amount: string | number, symbol: string): str
     return numAmount.toFixed(6);
   } else if (symbol === "BTC") {
     return numAmount.toFixed(8);
-  } else if (symbol === "STRK") {
-    return numAmount.toFixed(4);
   }
   
   return numAmount.toString();
