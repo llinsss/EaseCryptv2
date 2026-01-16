@@ -143,6 +143,10 @@
     background: linear-gradient(135deg, #0c0c4f, #0c0c4f);
   }
 
+  .crypto-icon.strk {
+    background: linear-gradient(135deg, #0c0c4f, #0c0c4f);
+  }
+
   /* Telegram-style button */
   .telegram-button {
     @apply bg-primary text-primary-foreground font-semibold py-4 px-6 rounded-lg;
