@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 interface CryptoIconProps {
-  symbol: "BTC" | "ETH" | "USDC" | "STRK";
+  symbol: "BTC" | "ETH" | "USDC";
   size?: "sm" | "md" | "lg";
   className?: string;
 }
@@ -17,7 +17,6 @@ export function CryptoIcon({ symbol, size = "md", className }: CryptoIconProps) 
     BTC: "₿",
     ETH: "Ξ",
     USDC: "USDC",
-    STRK: "STRK",
   };
 
   return (
@@ -30,7 +29,7 @@ export function CryptoIcon({ symbol, size = "md", className }: CryptoIconProps) 
       )}
       data-testid={`crypto-icon-${symbol.toLowerCase()}`}
     >
-      {symbol === "USDC" || symbol === "STRK" ? (
+      {symbol === "USDC" ? (
         <span className="text-xs font-bold">{symbol}</span>
       ) : (
         <span>{iconContent[symbol]}</span>
